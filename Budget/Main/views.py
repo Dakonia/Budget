@@ -3,82 +3,41 @@ from .models import Expense, Income, IncomeCategory, ExpenseCategory
 from .serializers import *
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
-from rest_framework.exceptions import ValidationError
-
-class UserCreateAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]  # Разрешаем доступ для всех пользователей
-
-
-class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Expense.objects.all()
-    serializer_class = ExpenseSerializer
-
-    def get_queryset(self):
-        # Получаем параметр категории из запроса
-        category_id = self.request.query_params.get('category', None)
-        
-        # Если категория передана, фильтруем траты по этой категории
-        if category_id is not None:
-            return Expense.objects.filter(category_id=category_id)
-        
-        # В противном случае, возвращаем все траты
-        return Expense.objects.all()
-
-class IncomeListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Income.objects.all()
-    serializer_class = IncomeSerializer
-
-class ExpenseCategoryListCreateAPIView(generics.ListCreateAPIView):
-    queryset = ExpenseCategory.objects.all()
-    serializer_class = ExpenseCategorySerializer
-
-class IncomeCategoryListCreateAPIView(generics.ListCreateAPIView):
-    queryset = IncomeCategory.objects.all()
-    serializer_class = IncomeCategorySerializer
-
-from rest_framework import generics
-from .models import Expense, Income, IncomeCategory, ExpenseCategory
-from .serializers import *
-from rest_framework.permissions import AllowAny
-from django.contrib.auth.models import User
-
-class UserCreateAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]  # Разрешаем доступ для всех пользователей
-
-
-class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Expense.objects.all()
-    serializer_class = ExpenseSerializer
-
-    def get_queryset(self):
-        # Получаем параметр категории из запроса
-        category_id = self.request.query_params.get('category', None)
-        
-        # Если категория передана, фильтруем траты по этой категории
-        if category_id is not None:
-            return Expense.objects.filter(category_id=category_id)
-        
-        # В противном случае, возвращаем все траты
-        return Expense.objects.all()
-
-class IncomeListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Income.objects.all()
-    serializer_class = IncomeSerializer
-
-class ExpenseCategoryListCreateAPIView(generics.ListCreateAPIView):
-    queryset = ExpenseCategory.objects.all()
-    serializer_class = ExpenseCategorySerializer
-
-class IncomeCategoryListCreateAPIView(generics.ListCreateAPIView):
-    queryset = IncomeCategory.objects.all()
-    serializer_class = IncomeCategorySerializer
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
+
+class UserCreateAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]  # Разрешаем доступ для всех пользователей
+
+class ExpenseListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        category_id = self.kwargs.get('categoryId')  # Получаем categoryId из URL
+        if category_id:
+            return Expense.objects.filter(user=user, category_id=category_id)
+        else:
+            return Expense.objects.filter(user=user)
+
+
+class IncomeListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Income.objects.all()
+    serializer_class = IncomeSerializer
+
+class ExpenseCategoryListCreateAPIView(generics.ListCreateAPIView):
+    queryset = ExpenseCategory.objects.all()
+    serializer_class = ExpenseCategorySerializer
+
+class IncomeCategoryListCreateAPIView(generics.ListCreateAPIView):
+    queryset = IncomeCategory.objects.all()
+    serializer_class = IncomeCategorySerializer
+
 
 class ExpenseCreateAPIView(generics.CreateAPIView):
     queryset = Expense.objects.all()
@@ -101,3 +60,4 @@ class ExpenseCreateAPIView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+

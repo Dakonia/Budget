@@ -1,41 +1,62 @@
-// ExpenseTable.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import api from './Api';
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear().toString().slice(-2);
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  return `${day}.${month}.${year}`;
+};
 
 const ExpenseTable = () => {
-  const { categoryId } = useParams();
+  const { categoryId } = useParams(); // Получаем только categoryId из URL параметров
   const [expenses, setExpenses] = useState([]);
 
   useEffect(() => {
-    axios.get(`http://127.0.0.1:8000/api/expenses/?category=${categoryId}`)
-      .then(response => setExpenses(response.data))
-      .catch(error => console.error('Ошибка при получении трат:', error));
-  }, [categoryId]);
+    console.log('Текущая категория:', categoryId);
+        // Добавляем токен авторизации к заголовкам axios
+        api.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
-  return (
-    <div>
-      <h2>Траты по выбранной категории</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Сумма</th>
-            <th>Описание</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map(expense => (
-            <tr key={expense.id}>
-              <td>{expense.created_at}</td>
-              <td>{expense.amount}</td>
-              <td>{expense.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-export default ExpenseTable;
+        // Получаем идентификатор пользователя из локального хранилища
+        const userId = localStorage.getItem('user');
+    
+        // Проверяем, что userId не пустой
+        if (userId) {
+          api.get(`expenses/category/${categoryId}/`, { params: {} })
+            .then(response => {
+              console.log('Ответ на запрос трат:', response.data);
+              setExpenses(response.data);
+            })
+            .catch(error => console.error('Ошибка при получении трат:', error));
+        }
+      }, [categoryId]);
+    
+      return (
+        <div>
+          <h2>Траты по выбранной категории</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Сумма</th>
+                <th>Описание</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenses.map(expense => (
+                <tr key={expense.id}>
+                  <td>{formatDate(expense.created_at)}</td>
+                  <td>{expense.amount}</td>
+                  <td>{expense.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    
+    export default ExpenseTable;
+    

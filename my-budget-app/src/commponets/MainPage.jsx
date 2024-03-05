@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import TotalExpenses from './TotalExpenses';
+import api from './Api'; // Подключаем наш файл с настройками API
 
 const MainPage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -13,8 +14,11 @@ const MainPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
+    console.log('isLoggedIn:', isLoggedIn); // Проверяем значение isLoggedIn
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUsername(storedUser);
@@ -26,16 +30,24 @@ const MainPage = () => {
       setToken(storedToken);
     }
 
-    axios.get('http://127.0.0.1:8000/api/expenses/')
-      .then(response => setExpenses(response.data))
-      .catch(error => console.error('Ошибка при получении всех трат:', error));
+    // Получаем траты текущего пользователя
+    if (isLoggedIn) {
+      api.get('expenses/')
+        .then(response => {
+          console.log('Expenses response:', response.data); // Проверяем данные трат
+          setExpenses(response.data);
+        })
+        .catch(error => console.error('Ошибка при получении всех трат:', error));
+    }
 
-    axios.get('http://127.0.0.1:8000/api/expense-categories/')
+    // Получаем все категории
+    api.get('expense-categories/')
       .then(response => {
+        console.log('Categories response:', response.data); // Проверяем данные категорий
         setCategories(response.data);
       })
       .catch(error => console.error('Ошибка при получении всех категорий:', error));
-  }, []);
+  }, [isLoggedIn, successMessage]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -47,10 +59,12 @@ const MainPage = () => {
       console.log('Login successful:', response.data);
       setIsLoggedIn(true);
       localStorage.setItem('user', username);
-      localStorage.setItem('token', response.data.access); // Сохраняем токен в localStorage
+      localStorage.setItem('token', response.data.access);
       setToken(response.data.access);
+      setLoginError('');
     } catch (error) {
       console.error('Error during login:', error);
+      setLoginError('Ошибка при входе. Пожалуйста, проверьте логин и пароль.');
     }
   };
 
@@ -63,6 +77,10 @@ const MainPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!isLoggedIn) {
+      alert('Для добавления новой траты войдите в систему');
+      return;
+    }
     try {
       console.log('Submitting expense data:', {
         category: selectedCategory,
@@ -70,27 +88,22 @@ const MainPage = () => {
         description: description
       });
 
-      const token = localStorage.getItem('token'); // Получаем токен из localStorage, предполагая, что он был сохранен при входе в систему
-      console.log('Token:', token); // Выводим токен в консоль для проверки
-
-      const response = await axios.post('http://localhost:8000/api/create-expense/', {
+      const response = await api.post('create-expense/', {
         category: selectedCategory,
         amount: amount,
         description: description
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}` // Включаем токен аутентификации в заголовке запроса
-        }
       });
 
       console.log('Expense created successfully:', response.data);
-      // Добавьте здесь логику для обновления списка трат
+      setSuccessMessage('Трата успешно добавлена');
+      setSelectedCategory('');
+      setAmount('');
+      setDescription('');
     } catch (error) {
       console.error('Error creating expense:', error);
     }
   };
 
-  // Функция для форматирования даты
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear().toString().slice(-2);
@@ -101,6 +114,7 @@ const MainPage = () => {
 
   return (
     <div>
+      {successMessage && <p>{successMessage}</p>}
       {isLoggedIn ? (
         <div>
           <h2>Вы успешно вошли, {username}!</h2>
@@ -119,6 +133,7 @@ const MainPage = () => {
               <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <button type="submit">Войти</button>
+            {loginError && <p>{loginError}</p>}
           </form>
           <Link to="/registration">Регистрация</Link>
         </div>
