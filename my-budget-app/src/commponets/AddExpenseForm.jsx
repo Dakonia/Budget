@@ -1,13 +1,35 @@
-// ExpenseForm.jsx
 import React, { useState } from 'react';
+import api from './Api';
+import '../styles/AddExpenseForm.css';
 
-const ExpenseForm = ({ categories, handleSubmit }) => {
+const AddExpenseForm = ({ categories, onSuccess }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await api.post('create-expense/', {
+        category: selectedCategory,
+        amount: amount,
+        description: description
+      });
+
+      console.log('Expense created successfully:', response.data);
+      onSuccess(); // Обновляем данные после успешного добавления траты
+
+      // Сброс состояний полей формы на пустые значения
+      setSelectedCategory('');
+      setAmount('');
+      setDescription('');
+    } catch (error) {
+      console.error('Error creating expense:', error);
+    }
+  };
+
   return (
-    <div>
+    <div className="form-container">
       <h2>Добавить новую трату</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -33,4 +55,4 @@ const ExpenseForm = ({ categories, handleSubmit }) => {
   );
 }
 
-export default ExpenseForm;
+export default AddExpenseForm;
