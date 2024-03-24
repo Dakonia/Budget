@@ -1,40 +1,37 @@
-// MainPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import TotalExpenses from './TotalExpenses';
-import api from './Api'; // Подключаем наш файл с настройками API
-import Header from './Header'; // Импортируем компонент Header
+import api from './Api';
+import Header from './Header';
 import AddExpenseForm from './AddExpenseForm';
-import ExpenseList from './ExpenseList'; // Импортируем новый компонент
+import ExpenseList from './ExpenseList';
+import ReactPaginate from 'react-paginate';
+import '../styles/MainPage.css';
+import TotalExpenses from './TotalExpenses'; // Импортируем компонент TotalExpenses
 
 const MainPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage] = useState(15); // Количество трат на странице
 
   useEffect(() => {
-    console.log('isLoggedIn:', isLoggedIn); // Проверяем значение isLoggedIn
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUsername(storedUser);
       setIsLoggedIn(true);
     }
 
-    // Получаем траты текущего пользователя
     if (isLoggedIn) {
       api.get('expenses/')
         .then(response => {
-          console.log('Expenses response:', response.data); // Проверяем данные трат
           setExpenses(response.data);
         })
         .catch(error => console.error('Ошибка при получении всех трат:', error));
     }
 
-    // Получаем все категории
     api.get('expense-categories/')
       .then(response => {
-        console.log('Categories response:', response.data); // Проверяем данные категорий
         setCategories(response.data);
       })
       .catch(error => console.error('Ошибка при получении всех категорий:', error));
@@ -49,13 +46,15 @@ const MainPage = () => {
   };
 
   const handleAddExpenseSuccess = () => {
-    // Обновляем данные после успешного добавления траты
     api.get('expenses/')
       .then(response => {
-        console.log('Expenses response:', response.data); // Проверяем данные трат
         setExpenses(response.data);
       })
       .catch(error => console.error('Ошибка при получении всех трат:', error));
+  };
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected + 1);
   };
 
   return (
@@ -67,8 +66,17 @@ const MainPage = () => {
         onLogout={handleLogout} 
       />
       <div className="content">
+        <TotalExpenses expenses={expenses} /> 
         <AddExpenseForm categories={categories} onSuccess={handleAddExpenseSuccess} />
-        <ExpenseList expenses={expenses} categories={categories} />
+        <ExpenseList expenses={expenses} categories={categories} currentPage={currentPage} perPage={perPage} />
+        <ReactPaginate
+          pageCount={Math.ceil(expenses.length / perPage)}
+          pageRangeDisplayed={5}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={'pagination custom-cursor'} // добавляем класс custom-cursor
+          activeClassName={'active'}
+        />
       </div>
     </div>
   );

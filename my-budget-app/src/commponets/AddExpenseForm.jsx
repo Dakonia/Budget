@@ -1,8 +1,10 @@
+// AddExpenseForm.jsx
+
 import React, { useState } from 'react';
 import api from './Api';
 import '../styles/AddExpenseForm.css';
 
-const AddExpenseForm = ({ categories, onSuccess }) => {
+const AddExpenseForm = ({ categories, onSuccess, setTotalExpenses }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -18,8 +20,7 @@ const AddExpenseForm = ({ categories, onSuccess }) => {
 
       console.log('Expense created successfully:', response.data);
       onSuccess(); // Обновляем данные после успешного добавления траты
-
-      // Сброс состояний полей формы на пустые значения
+      setTotalExpenses(); // Обновляем общую сумму трат
       setSelectedCategory('');
       setAmount('');
       setDescription('');

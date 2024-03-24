@@ -1,9 +1,16 @@
 // ExpenseList.jsx
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import '../styles/ExpenseList.css';
 import TotalExpenses from './TotalExpenses';
 
-const ExpenseList = ({ expenses, categories }) => {
+const ExpenseList = ({ expenses, categories, currentPage, perPage }) => {
+  const [totalExpenses, setTotalExpenses] = useState(0);
+
+  useEffect(() => {
+    calculateTotalExpenses();
+  }, [expenses]); // Обновляем сумму трат при изменении списка трата
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear().toString().slice(-2);
@@ -12,10 +19,21 @@ const ExpenseList = ({ expenses, categories }) => {
     return `${day}.${month}.${year}`;
   };
 
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = currentPage * perPage;
+  const currentExpenses = expenses.slice(startIndex, endIndex);
+
+  const calculateTotalExpenses = () => {
+    let total = 0;
+    currentExpenses.forEach(expense => {
+      total += parseFloat(expense.amount);
+    });
+    setTotalExpenses(total.toFixed(2));
+  };
+
   return (
     <div>
       <h2 className="expense-list-title">Все траты за месяц</h2>
-      <TotalExpenses expenses={expenses} />
       <table className="table">
         <thead>
           <tr>
@@ -26,7 +44,7 @@ const ExpenseList = ({ expenses, categories }) => {
           </tr>
         </thead>
         <tbody>
-          {expenses.map(expense => (
+          {currentExpenses.map(expense => (
             <tr key={expense.id}>
               <td>{formatDate(expense.created_at)}</td>
               <td>{categories.find(cat => cat.id === expense.category)?.name}</td>

@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
+from .pagination import CustomPageNumberPagination
 
 class UserCreateAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -13,7 +14,7 @@ class UserCreateAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]  # Разрешаем доступ для всех пользователей
 
 class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Expense.objects.all()
+    queryset = Expense.objects.all().order_by('-created_at')  # Обратная сортировка по времени создания
     serializer_class = ExpenseSerializer
     permission_classes = [IsAuthenticated]
 
@@ -21,9 +22,9 @@ class ExpenseListCreateAPIView(generics.ListCreateAPIView):
         user = self.request.user
         category_id = self.kwargs.get('categoryId')  # Получаем categoryId из URL
         if category_id:
-            return Expense.objects.filter(user=user, category_id=category_id)
+            return Expense.objects.filter(user=user, category_id=category_id).order_by('-created_at')
         else:
-            return Expense.objects.filter(user=user)
+            return Expense.objects.filter(user=user).order_by('-created_at')
 
 
 class IncomeListCreateAPIView(generics.ListCreateAPIView):
@@ -60,4 +61,3 @@ class ExpenseCreateAPIView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
