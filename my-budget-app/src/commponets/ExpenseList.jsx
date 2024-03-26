@@ -1,5 +1,3 @@
-// ExpenseList.jsx
-
 import React, { useState, useEffect } from 'react';
 import '../styles/ExpenseList.css';
 import TotalExpenses from './TotalExpenses';

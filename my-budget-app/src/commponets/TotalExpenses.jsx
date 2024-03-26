@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/TotalExpenses.css';
-import api from './Api';
 
 const TotalExpenses = ({ expenses }) => {
   const [totalExpenses, setTotalExpenses] = useState(0);

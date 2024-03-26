@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from './Api';
+import TotalExpensesForCategory from './TotalExpensesForCategory';
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -11,7 +12,7 @@ const formatDate = (dateString) => {
 };
 
 const ExpenseTable = () => {
-  const { categoryId } = useParams(); // Получаем только categoryId из URL параметров
+  const { categoryId } = useParams();
   const [expenses, setExpenses] = useState([]);
 
   useEffect(() => {
@@ -32,31 +33,38 @@ const ExpenseTable = () => {
             .catch(error => console.error('Ошибка при получении трат:', error));
         }
       }, [categoryId]);
-    
-      return (
-        <div>
-          <h2>Траты по выбранной категории</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Сумма</th>
-                <th>Описание</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map(expense => (
-                <tr key={expense.id}>
-                  <td>{formatDate(expense.created_at)}</td>
-                  <td>{expense.amount}</td>
-                  <td>{expense.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
-    }
-    
-    export default ExpenseTable;
-    
+
+  return (
+    <div>
+      <h2>Траты по выбранной категории</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Сумма</th>
+            <th>Описание</th>
+          </tr>
+        </thead>
+        <tbody>
+          {expenses.map(expense => (
+            <tr key={expense.id}>
+              <td>{formatDate(expense.created_at)}</td>
+              <td>{expense.amount}</td>
+              <td>{expense.description}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>Итого за месяц:</th>
+            <th colSpan="2">
+              <TotalExpensesForCategory expenses={expenses} />
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+};
+
+export default ExpenseTable;

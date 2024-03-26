@@ -1,3 +1,4 @@
+// MainPage.jsx
 import React, { useState, useEffect } from 'react';
 import api from './Api';
 import Header from './Header';
@@ -5,7 +6,7 @@ import AddExpenseForm from './AddExpenseForm';
 import ExpenseList from './ExpenseList';
 import ReactPaginate from 'react-paginate';
 import '../styles/MainPage.css';
-import TotalExpenses from './TotalExpenses'; // Импортируем компонент TotalExpenses
+import TotalExpenses from './TotalExpenses'; 
 
 const MainPage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -13,7 +14,7 @@ const MainPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage] = useState(15); // Количество трат на странице
+  const [perPage] = useState(15); 
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -27,14 +28,18 @@ const MainPage = () => {
         .then(response => {
           setExpenses(response.data);
         })
-        .catch(error => console.error('Ошибка при получении всех трат:', error));
+        .catch(error => {
+          console.error('Ошибка при получении всех трат:', error);
+        });
     }
 
     api.get('expense-categories/')
       .then(response => {
         setCategories(response.data);
       })
-      .catch(error => console.error('Ошибка при получении всех категорий:', error));
+      .catch(error => {
+        console.error('Ошибка при получении всех категорий:', error);
+      });
   }, [isLoggedIn]);
 
   const handleLogin = () => {
@@ -50,7 +55,9 @@ const MainPage = () => {
       .then(response => {
         setExpenses(response.data);
       })
-      .catch(error => console.error('Ошибка при получении всех трат:', error));
+      .catch(error => {
+        console.error('Ошибка при получении всех трат:', error);
+      });
   };
 
   const handlePageClick = ({ selected }) => {
@@ -74,7 +81,7 @@ const MainPage = () => {
           pageRangeDisplayed={5}
           marginPagesDisplayed={2}
           onPageChange={handlePageClick}
-          containerClassName={'pagination custom-cursor'} // добавляем класс custom-cursor
+          containerClassName={'pagination custom-cursor'} 
           activeClassName={'active'}
         />
       </div>
@@ -83,3 +90,4 @@ const MainPage = () => {
 }
 
 export default MainPage;
+
