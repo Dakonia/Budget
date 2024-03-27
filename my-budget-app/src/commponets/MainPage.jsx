@@ -1,3 +1,4 @@
+// MainPage.js
 import React, { useState, useEffect } from 'react';
 import api from './Api';
 import Header from './Header';
@@ -5,7 +6,10 @@ import AddExpenseForm from './AddExpenseForm';
 import ExpenseList from './ExpenseList';
 import ReactPaginate from 'react-paginate';
 import '../styles/MainPage.css';
-import TotalExpenses from './TotalExpenses'; 
+import TotalExpenses from './TotalExpenses';
+import { getCurrentMonthName, handleFilterByMonthYear } from './dateFilters'; 
+import DateRangePicker from './DateRangePicker';
+import DateFilterControls from './DateFilterControls';
 
 const MainPage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -89,10 +93,6 @@ const MainPage = () => {
     setCurrentPage(selected + 1);
   };
 
-  const handleSearch = () => {
-    setSearchClicked(true);
-  };
-
   const fetchExpenses = async (start, end) => {
     try {
       const response = await api.get('expenses/', {
@@ -105,29 +105,6 @@ const MainPage = () => {
     }
   };
 
-  const getCurrentMonthName = (date) => {
-    const currentDate = date || new Date();
-    return currentDate.toLocaleString('default', { month: 'long' });
-  };
-
-  const handleMonthChange = (e) => {
-    setSelectedMonth(e.target.value);
-  };
-
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
-  };
-
-  const handleFilterByMonthYear = () => {
-    if (selectedMonth && selectedYear) {
-      const selectedStartDate = new Date(selectedYear, selectedMonth - 1, 1);
-      const selectedEndDate = new Date(selectedYear, selectedMonth, 0);
-      setStartDate(selectedStartDate.toISOString().split('T')[0]);
-      setEndDate(selectedEndDate.toISOString().split('T')[0]);
-      fetchExpenses(selectedStartDate.toISOString().split('T')[0], selectedEndDate.toISOString().split('T')[0]);
-    }
-  };
-
   return (
     <div>
       <Header 
@@ -137,30 +114,27 @@ const MainPage = () => {
         onLogout={handleLogout} 
       />
       <div className="content">
-      <TotalExpenses expenses={expenses} /> 
+        <TotalExpenses expenses={expenses} /> 
         <AddExpenseForm categories={categories} onSuccess={handleAddExpenseSuccess} />
-        <div>
-          <label htmlFor="startDate">Start Date:</label>
-          <input type="date" id="startDate" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <label htmlFor="endDate">End Date:</label>
-          <input type="date" id="endDate" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <button onClick={handleSearch}>Search</button>
-        </div>
-        <div>
-          <select value={selectedMonth} onChange={handleMonthChange}>
-            <option value="">Select Month</option>
-            {Array.from({ length: 12 }, (_, index) => index + 1).map(month => (
-              <option key={month} value={month}>{getCurrentMonthName(new Date(selectedYear, month - 1))}</option>
-            ))}
-          </select>
-          <select value={selectedYear} onChange={handleYearChange}>
-            <option value="">Select Year</option>
-            {Array.from({ length: new Date().getFullYear() - 2023 }, (_, index) => 2024 + index).map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-          <button onClick={handleFilterByMonthYear}>Filter</button>
-        </div>
+        <DateRangePicker 
+          startDate={startDate} 
+          endDate={endDate} 
+          setStartDate={setStartDate} 
+          setEndDate={setEndDate} 
+          handleSearch={setSearchClicked} 
+        />
+        <DateFilterControls 
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          fetchExpenses={fetchExpenses}
+          handleMonthChange={(e) => setSelectedMonth(e.target.value)}
+          handleYearChange={(e) => setSelectedYear(e.target.value)}
+          handleFilterByMonthYear={handleFilterByMonthYear(selectedMonth, selectedYear, setStartDate, setEndDate, fetchExpenses)}
+        />
         <h3>{`Траты за ${getCurrentMonthName(new Date(selectedYear, selectedMonth - 1))} ${selectedYear}`}</h3>
         <p>{`Количество трат: ${totalExpensesCount}`}</p>
         <ExpenseList expenses={expenses} categories={categories} currentPage={currentPage} perPage={perPage} />
@@ -178,5 +152,3 @@ const MainPage = () => {
 }
 
 export default MainPage;
-
-       
