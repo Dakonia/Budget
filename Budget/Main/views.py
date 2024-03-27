@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
-from .pagination import CustomPageNumberPagination
+from datetime import datetime
 
 class UserCreateAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -14,17 +14,27 @@ class UserCreateAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]  # Разрешаем доступ для всех пользователей
 
 class ExpenseListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Expense.objects.all().order_by('-created_at')  # Обратная сортировка по времени создания
+    queryset = Expense.objects.all().order_by('-created_at')  
     serializer_class = ExpenseSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        category_id = self.kwargs.get('categoryId')  # Получаем categoryId из URL
+        category_id = self.kwargs.get('categoryId')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
         if category_id:
-            return Expense.objects.filter(user=user, category_id=category_id).order_by('-created_at')
+            queryset = Expense.objects.filter(user=user, category_id=category_id)
         else:
-            return Expense.objects.filter(user=user).order_by('-created_at')
+            queryset = Expense.objects.filter(user=user)
+        
+        if start_date and end_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            queryset = queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
+        
+        return queryset.order_by('-created_at')
 
 
 class IncomeListCreateAPIView(generics.ListCreateAPIView):
