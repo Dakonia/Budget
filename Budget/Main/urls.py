@@ -12,4 +12,6 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/expenses/category/<int:categoryId>/', ExpenseListCreateAPIView.as_view(), name='expense-list-by-category'),
+    path('api/expense-categories/<int:pk>/', ExpenseCategoryDetailAPIView.as_view(), name='expense-category-detail'),
+
 ]
