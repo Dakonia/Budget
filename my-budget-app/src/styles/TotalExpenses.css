@@ -1,0 +1,16 @@
+/* TotalExpenses.css */
+.total-expenses {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .total-expenses p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333; /* Цвет текста */
+    background-color: #f0f0f0; /* Фоновый цвет */
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень */
+  }
+  

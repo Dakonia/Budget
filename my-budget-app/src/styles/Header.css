@@ -1,0 +1,35 @@
+/* Header.css */
+.header {
+  background-color: #222;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 40px;
+  margin-left: 100px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.actions a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 20px;
+}
+.category {
+  font-size: 20px;
+  margin-right: 20px;
+  color: #fff;
+  text-decoration: none;
+
+}
+
