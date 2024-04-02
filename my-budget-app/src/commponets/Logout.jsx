@@ -3,9 +3,11 @@ import React from 'react';
 
 const Logout = ({ username, onLogout }) => {
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    onLogout();
+    localStorage.removeItem('user'); // Удаляем пользователя из хранилища
+    localStorage.removeItem('token'); // Удаляем access token из хранилища
+    localStorage.removeItem('refreshToken'); // Удаляем refresh token из хранилища
+    onLogout(); // Вызываем функцию обработчика выхода пользователя
+    window.location.reload(); // Обновляем страницу
   };
 
   return (

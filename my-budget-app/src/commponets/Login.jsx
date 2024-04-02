@@ -20,6 +20,7 @@ const Login = ({ onLogin }) => {
       localStorage.setItem('token', response.data.access);
       localStorage.setItem('refreshToken', response.data.refresh);
       onLogin();
+      window.location.reload(); // Обновляем страницу после успешного входа
     } catch (error) {
       console.error('Error during login:', error);
       setLoginError('Ошибка при входе. Пожалуйста, проверьте логин и пароль.');

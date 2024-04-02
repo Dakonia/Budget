@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from './Api';
 import TotalExpensesForCategory from './TotalExpensesForCategory';
+import Header from './Header';
+import DateRangePicker from './DateRangePicker';
+import MonthPicker from './MonthPicker';
+import '../styles/ExpenseList.css';
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -14,30 +18,82 @@ const formatDate = (dateString) => {
 const ExpenseTable = () => {
   const { categoryId } = useParams();
   const [expenses, setExpenses] = useState([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
     console.log('Текущая категория:', categoryId);
-        // Добавляем токен авторизации к заголовкам axios
-        api.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    const userId = localStorage.getItem('user');
 
-        // Получаем идентификатор пользователя из локального хранилища
-        const userId = localStorage.getItem('user');
-    
-        // Проверяем, что userId не пустой
-        if (userId) {
-          api.get(`expenses/category/${categoryId}/`, { params: {} })
-            .then(response => {
-              console.log('Ответ на запрос трат:', response.data);
-              setExpenses(response.data);
-            })
-            .catch(error => console.error('Ошибка при получении трат:', error));
+    if (userId) {
+      api.get(`expenses/category/${categoryId}/`, { params: {} })
+        .then(response => {
+          console.log('Ответ на запрос трат:', response.data);
+          setExpenses(response.data);
+        })
+        .catch(error => console.error('Ошибка при получении трат:', error));
+    }
+  }, [categoryId]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [currentDate, startDate, endDate]);
+
+  const fetchExpenses = async () => {
+    try {
+      let start, end;
+      if (startDate && endDate) {
+        start = startDate;
+        end = endDate;
+      } else {
+        start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      }
+
+      const response = await api.get('expenses/', {
+        params: {
+          start_date: start.toISOString().split('T')[0],
+          end_date: end.toISOString().split('T')[0]
         }
-      }, [categoryId]);
+      });
+
+      setExpenses(response.data);
+    } catch (error) {
+      console.error('Ошибка при получении расходов:', error);
+    }
+  };
+
+  const handleMonthChange = (month) => {
+    setCurrentDate(prevDate => new Date(prevDate.getFullYear(), month - 1, prevDate.getDate()));
+  };
+
+  const handleYearChange = (year) => {
+    setCurrentDate(prevDate => new Date(year, prevDate.getMonth(), prevDate.getDate()));
+  };
+
+  const handleDateRangeChange = (start, end) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const handleRefresh = () => {
+    setCurrentDate(new Date());
+    setStartDate(null);
+    setEndDate(null);
+    fetchExpenses();
+  };
 
   return (
     <div>
+      <Header />
+      <MonthPicker selectedMonth={currentDate.getMonth() + 1} selectedYear={currentDate.getFullYear()} onMonthChange={handleMonthChange} onYearChange={handleYearChange} />
+      <button onClick={handleRefresh}>Обновить</button>
+      <DateRangePicker onDateRangeChange={handleDateRangeChange} />
       <h2>Траты по выбранной категории</h2>
-      <table>
+      <TotalExpensesForCategory expenses={expenses} />
+      <table className="table">
         <thead>
           <tr>
             <th>Дата</th>
@@ -56,10 +112,7 @@ const ExpenseTable = () => {
         </tbody>
         <tfoot>
           <tr>
-            <th>Итого за месяц:</th>
-            <th colSpan="2">
-              <TotalExpensesForCategory expenses={expenses} />
-            </th>
+            <th colSpan="2"></th>
           </tr>
         </tfoot>
       </table>
