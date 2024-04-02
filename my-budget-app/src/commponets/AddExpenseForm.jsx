@@ -1,13 +1,13 @@
 // AddExpenseForm.jsx
-
 import React, { useState } from 'react';
 import api from './Api';
 import '../styles/AddExpenseForm.css';
 
-const AddExpenseForm = ({ categories, onSuccess, setTotalExpenses }) => {
+const AddExpenseForm = ({ categories, handleRefresh }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,19 +19,20 @@ const AddExpenseForm = ({ categories, onSuccess, setTotalExpenses }) => {
       });
 
       console.log('Expense created successfully:', response.data);
-      onSuccess(); // Обновляем данные после успешного добавления траты
-      setTotalExpenses(); // Обновляем общую сумму трат
       setSelectedCategory('');
       setAmount('');
       setDescription('');
+      handleRefresh(); // Вызываем функцию обновления списка трат после успешного добавления
     } catch (error) {
       console.error('Error creating expense:', error);
+      setError(error.message); // Устанавливаем сообщение об ошибке
     }
   };
 
   return (
     <div className="form-container">
       <h2>Добавить новую трату</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Отображаем сообщение об ошибке */}
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="category">Категория:</label>

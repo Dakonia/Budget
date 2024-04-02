@@ -50,6 +50,10 @@ class ExpenseCategoryListCreateAPIView(generics.ListCreateAPIView):
         # Устанавливаем текущего пользователя в качестве владельца новой категории перед сохранением
         serializer.save(user=self.request.user)
 
+    def get_queryset(self):
+        # Возвращаем только категории, принадлежащие текущему пользователю
+        return ExpenseCategory.objects.filter(user=self.request.user)    
+
 class IncomeCategoryListCreateAPIView(generics.ListCreateAPIView):
     queryset = IncomeCategory.objects.all()
     serializer_class = IncomeCategorySerializer

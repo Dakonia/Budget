@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import AddCategoryForm from './AddCategoryForm';
 import EditCategoryForm from './EditCategoryForm';
 import DeleteCategoryButton from './DeleteCategoryButton';
+import Header from './Header';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -33,6 +34,7 @@ const CategoryList = () => {
 
   return (
     <div>
+      <Header />
       <h2>Список категорий трат</h2>
       <ul>
         {categories.map(category => (
