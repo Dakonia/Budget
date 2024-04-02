@@ -6,6 +6,7 @@ import Header from './Header';
 import DateRangePicker from './DateRangePicker';
 import MonthPicker from './MonthPicker';
 import '../styles/ExpenseList.css';
+import '../styles/MainPage.css'
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -89,7 +90,7 @@ const ExpenseTable = () => {
     <div>
       <Header />
       <MonthPicker selectedMonth={currentDate.getMonth() + 1} selectedYear={currentDate.getFullYear()} onMonthChange={handleMonthChange} onYearChange={handleYearChange} />
-      <button onClick={handleRefresh}>Обновить</button>
+      <button className="refresh-button" onClick={handleRefresh}>Обновить</button>
       <DateRangePicker onDateRangeChange={handleDateRangeChange} />
       <h2>Траты по выбранной категории</h2>
       <TotalExpensesForCategory expenses={expenses} />

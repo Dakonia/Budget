@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import api from './Api';
+import '../styles/AddCategoryForm.css'; // Импорт CSS стилей
 
 const AddCategoryForm = ({ onSuccess }) => {
   const [name, setName] = useState('');
@@ -18,9 +19,9 @@ const AddCategoryForm = ({ onSuccess }) => {
   };
 
   return (
-    <div>
-      <h2>Добавить категорию трат</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="add-category-form-container">
+      <h2 className="add-category-form-title">Добавить категорию трат</h2>
+      <form className="add-category-form" onSubmit={handleSubmit}>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Введите название категории" />
         <button type="submit">Добавить</button>
       </form>

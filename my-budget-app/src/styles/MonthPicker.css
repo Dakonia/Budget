@@ -1,0 +1,16 @@
+/* MonthPicker.css */
+.month-picker-container {
+    margin-top: 10px;
+    display: flex;
+    align-items: center; /* Центрирование элементов по вертикали */
+  }
+  
+  .month-picker-select {
+    margin-right: 10px; /* Добавляем небольшой отступ между полями выбора */
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+  }
+  

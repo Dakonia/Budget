@@ -1,0 +1,37 @@
+/* AddCategoryForm.css */
+
+.add-category-form-container {
+    max-width: 400px;
+    margin-top: 0px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .add-category-form-title {
+    margin-bottom: 10px;
+  }
+  
+  .add-category-form input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .add-category-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-category-form button:hover {
+    background-color: #0056b3;
+  }
+  

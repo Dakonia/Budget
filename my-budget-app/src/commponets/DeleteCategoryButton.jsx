@@ -2,6 +2,7 @@
 
 import React from 'react';
 import api from './Api';
+import '../styles/DeleteCategoryButton.css'; // Импорт CSS стилей
 
 const DeleteCategoryButton = ({ categoryId, onSuccess }) => {
   const handleDelete = async () => {
@@ -14,7 +15,7 @@ const DeleteCategoryButton = ({ categoryId, onSuccess }) => {
   };
 
   return (
-    <button onClick={handleDelete}>Удалить</button>
+    <button className="delete-category-button" onClick={handleDelete}>Удалить</button>
   );
 }
 

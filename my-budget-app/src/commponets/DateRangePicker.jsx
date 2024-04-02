@@ -1,7 +1,8 @@
+// DateRangePicker.jsx
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import "../styles/DateRangePicker.css"
+import '../styles/DateRangePicker.css';
 
 const DateRangePicker = ({ onDateRangeChange }) => {
   const [startDate, setStartDate] = useState(null);
@@ -9,22 +10,20 @@ const DateRangePicker = ({ onDateRangeChange }) => {
 
   const handleSearch = () => {
     if (startDate && endDate && onDateRangeChange) {
-      // Корректируем даты, чтобы учесть выбранный диапазон
       const correctedStart = new Date(startDate);
       const correctedEnd = new Date(endDate);
-      correctedStart.setDate(correctedStart.getDate() + 1); // Добавляем один день к начальной дате
-      correctedEnd.setDate(correctedEnd.getDate() + 2, 2); // Добавляем один день к конечной дате
+      correctedStart.setDate(correctedStart.getDate() + 1);
+      correctedEnd.setDate(correctedEnd.getDate() + 1);
       onDateRangeChange(correctedStart, correctedEnd);
-
-      // Очищаем поля с датами после нажатия на кнопку "Поиск"
       setStartDate(null);
       setEndDate(null);
     }
   };
 
   return (
-    <div className="date-range-picker">
+    <div className="date-range-picker-container">
       <DatePicker
+        className="date-range-picker-input"
         selected={startDate}
         onChange={date => setStartDate(date)}
         selectsStart
@@ -34,6 +33,7 @@ const DateRangePicker = ({ onDateRangeChange }) => {
         dateFormat="dd.MM.yyyy"
       />
       <DatePicker
+        className="date-range-picker-input"
         selected={endDate}
         onChange={date => setEndDate(date)}
         selectsEnd
@@ -43,7 +43,7 @@ const DateRangePicker = ({ onDateRangeChange }) => {
         placeholderText="Конечная дата"
         dateFormat="dd.MM.yyyy"
       />
-      <button onClick={handleSearch}>Поиск</button>
+      <button className="date-range-picker-button" onClick={handleSearch}>Поиск</button>
     </div>
   );
 };

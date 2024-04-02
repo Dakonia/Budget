@@ -89,7 +89,7 @@ const MainPage = () => {
           onMonthChange={handleMonthChange}
           onYearChange={handleYearChange}
         />
-        <button onClick={handleRefresh}>Обновить</button> {/* Кнопка обновления страницы */}
+        <button className="refresh-button" onClick={handleRefresh}>Обновить</button>
         <DateRangePicker onDateRangeChange={handleDateRangeChange} />
         <AddExpenseForm categories={categories} handleRefresh={handleRefresh} /> {/* Передаем функцию обновления списка трат */}
         <ExpenseList expenses={expenses} categories={categories} currentDate={currentDate} startDate={startDate} endDate={endDate} />
